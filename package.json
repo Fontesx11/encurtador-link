@@ -1,0 +1,38 @@
+{
+  "name": "encurtador-links",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main",
+    "migration:create": "dbmate new",
+    "migrate": "dbmate --wait up -v",
+    "migration:revert": "dbmate down",
+    "dbstatus": "dbmate status"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@nestjs/common": "^12.4.0",
+    "@nestjs/config": "^12.1.1",
+    "@nestjs/core": "^12.4.0",
+    "@nestjs/platform-express": "^12.4.0",
+    "@nestjs/typeorm": "^12.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^1.1.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.12",
+    "@nestjs/schematics": "^12.0.13",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "dbmate": "^2.37.0",
+    "typescript": "^6.0.3"
+  }
+}
