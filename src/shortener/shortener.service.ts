@@ -6,7 +6,7 @@ import { Access } from './entities/access.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { PaginationQueryDto } from '../core/dto/pagination-query.dto';
-import { Page, paginate } from '../core/utils/pagination.utils';
+import { getSkip, Page, paginate } from '../core/utils/pagination.utils';
 import { MessageResponse, ShortenResponse } from './dto/return-shortener.dto';
 
 const ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -86,19 +86,18 @@ export class ShortenerService {
     }
 
     async findAll(query: PaginationQueryDto): Promise<Page<Link>> {
-        const links = await this.linksRepository.find({
+        const [links, total] = await this.linksRepository.findAndCount({
             select: {
                 shortCode: true,
                 originalLink: true,
                 clickCount: true,
-            }
+            },
+            order: { createdAt: 'DESC' },
+            skip: getSkip(query.page, query.limit),
+            take: query.limit,
         })
 
-        if (!links) {
-            throw new NotFoundException("Links not found")
-        }
-
-        return paginate(links, query.page, query.limit)
+        return paginate(links, total, query.page, query.limit)
     }
 
   

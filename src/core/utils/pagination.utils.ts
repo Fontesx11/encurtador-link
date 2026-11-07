@@ -8,16 +8,18 @@ export interface Page<T> {
   };
 }
 
-export function paginate<T>(items: T[], page: number, limit: number): Page<T> {
-  const start = (page - 1) * limit;
+export function getSkip(page: number, limit: number): number {
+  return (page - 1) * limit;
+}
 
+export function paginate<T>(items: T[], total: number, page: number, limit: number): Page<T> {
   return {
-    data: items.slice(start, start + limit),
+    data: items,
     meta: {
       page,
       limit,
-      total_items: items.length,
-      total_pages: Math.ceil(items.length / limit),
+      total_items: total,
+      total_pages: Math.ceil(total / limit),
     },
   };
 }
