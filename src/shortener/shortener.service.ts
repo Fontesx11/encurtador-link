@@ -77,13 +77,13 @@ export class ShortenerService {
             return this.linksRepository.find(options);
         }
 
-        const club = await this.linksRepository.findOne(options);
+        const link = await this.linksRepository.findOne(options);
 
-        if (!club) {
+        if (!link) {
             throw new NotFoundException('Link not found');
         }
 
-        return club;
+        return link;
     }
 
     async findAll(query: PaginationQueryDto): Promise<Page<Link>> {

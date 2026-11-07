@@ -19,7 +19,7 @@ export class ShortenerController {
     async get(@Query() query: PaginationQueryDto): Promise<Page<ShortenerLinkResponseDto>> {
         const page = await this.shortenerService.findAll(query);
         return {
-            data: page.data.map((player) => new ShortenerLinkResponseDto(player)),
+            data: page.data.map((link) => new ShortenerLinkResponseDto(link)),
             meta: page.meta,
         };
     }
