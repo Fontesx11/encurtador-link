@@ -98,6 +98,14 @@ export class ShortenerService {
         return paginate(links, query.page, query.limit)
     }
 
+    async findOne(short_code: string){
+        const {originalLink} = await this.find({where:{
+            shortCode: short_code
+        }})
+
+        return originalLink
+    }
+
     async remove(short_code: string): Promise<MessageResponse> {
         const link = await this.find({ where: { shortCode: short_code } })
 

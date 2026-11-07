@@ -5,7 +5,7 @@ import { PaginationQueryDto } from '../core/dto/pagination-query.dto';
 import { MessageResponse, ShortenerLinkResponseDto, ShortenResponse } from './dto/return-shortener.dto';
 import { Page } from '../core/utils/pagination.utils';
 
-@Controller()
+@Controller('api')
 export class ShortenerController {
 
     constructor(private shortenerService: ShortenerService) { }
@@ -26,7 +26,7 @@ export class ShortenerController {
 
     @Delete('links/:short_code')
     async remove(@Param('short_code') short_code: string): Promise<MessageResponse> {
-       return await this.shortenerService.remove(short_code);
+        return await this.shortenerService.remove(short_code);
     }
 
 }
