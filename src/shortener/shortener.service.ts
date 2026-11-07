@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { randomInt } from 'crypto';
-import { FindManyOptions, FindOneOptions, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, FindManyOptions, FindOneOptions, QueryFailedError, Repository } from 'typeorm';
 import { Link } from './entities/link.entity';
 import { Access } from './entities/access.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,6 +21,7 @@ export class ShortenerService {
         @InjectRepository(Access)
         private readonly accessRepository: Repository<Access>,
         private readonly configService: ConfigService,
+        private readonly dataSource: DataSource,
     ) {
         this.baseUrl = this.configService.getOrThrow<string>('BASE_URL')
     }
@@ -107,18 +108,19 @@ export class ShortenerService {
             shortCode: short_code
         }})
 
-        await this.linksRepository.increment({ id: link.id }, 'clickCount', 1)
+        await this.dataSource.transaction(async (manager) => {
+            await manager.increment(Link, { id: link.id }, 'clickCount', 1)
 
-        const access = this.accessRepository.create({
-            ipAddress: ip,
-            userAgent: user_agent,
-            link: link
+            const access = this.accessRepository.create({
+                ipAddress: ip,
+                userAgent: user_agent,
+                link: link
+            })
+
+            await manager.save(access)
         })
 
-        await this.accessRepository.save(access)
-
         return link.originalLink
-    
     }
 
     async remove(short_code: string): Promise<MessageResponse> {
