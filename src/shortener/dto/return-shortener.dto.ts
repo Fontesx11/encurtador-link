@@ -21,3 +21,8 @@ export interface ShortenResponse {
 export interface MessageResponse {
   message: string
 }
+
+export interface RedirectResponse {
+  url: string
+  statusCode: number
+}

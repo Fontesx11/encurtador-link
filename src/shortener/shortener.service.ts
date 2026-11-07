@@ -103,7 +103,7 @@ export class ShortenerService {
 
   
 
-    async redirect(short_code: string, ip: string, user_agent?: string){
+    async redirect(short_code: string, ip: string, user_agent?: string): Promise<string> {
         const link = await this.find({where:{
             shortCode: short_code
         }})
