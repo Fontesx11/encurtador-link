@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { randomInt } from 'crypto';
 import { FindManyOptions, FindOneOptions, QueryFailedError, Repository } from 'typeorm';
 import { Link } from './entities/link.entity';
+import { Access } from './entities/access.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { PaginationQueryDto } from '../core/dto/pagination-query.dto';
@@ -17,6 +18,8 @@ export class ShortenerService {
     constructor(
         @InjectRepository(Link)
         private readonly linksRepository: Repository<Link>,
+        @InjectRepository(Access)
+        private readonly accessRepository: Repository<Access>,
         private readonly configService: ConfigService,
     ) {
         this.baseUrl = this.configService.getOrThrow<string>('BASE_URL')
@@ -98,12 +101,25 @@ export class ShortenerService {
         return paginate(links, query.page, query.limit)
     }
 
-    async findOne(short_code: string){
-        const {originalLink} = await this.find({where:{
+  
+
+    async redirect(short_code: string, ip: string, user_agent?: string){
+        const link = await this.find({where:{
             shortCode: short_code
         }})
 
-        return originalLink
+        await this.linksRepository.increment({ id: link.id }, 'clickCount', 1)
+
+        const access = this.accessRepository.create({
+            ipAddress: ip,
+            userAgent: user_agent,
+            link: link
+        })
+
+        await this.accessRepository.save(access)
+
+        return link.originalLink
+    
     }
 
     async remove(short_code: string): Promise<MessageResponse> {
