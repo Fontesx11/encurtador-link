@@ -2,7 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/commo
 import { ShortenerService } from './shortener.service';
 import { CreateShortenerDto } from './dto/create-shortener.dto';
 import { PaginationQueryDto } from '../core/dto/pagination-query.dto';
-import { ShortenerLinkResponseDto } from './dto/return-shortener.dto';
+import { MessageResponse, ShortenerLinkResponseDto, ShortenResponse } from './dto/return-shortener.dto';
+import { Page } from '../core/utils/pagination.utils';
 
 @Controller()
 export class ShortenerController {
@@ -10,12 +11,12 @@ export class ShortenerController {
     constructor(private shortenerService: ShortenerService) { }
 
     @Post('shorten')
-    create(@Body() dto: CreateShortenerDto) {
+    create(@Body() dto: CreateShortenerDto): Promise<ShortenResponse> {
         return this.shortenerService.short(dto.url)
     }
 
     @Get('links')
-    async get(@Query() query: PaginationQueryDto) {
+    async get(@Query() query: PaginationQueryDto): Promise<Page<ShortenerLinkResponseDto>> {
         const page = await this.shortenerService.findAll(query);
         return {
             data: page.data.map((player) => new ShortenerLinkResponseDto(player)),
@@ -24,7 +25,7 @@ export class ShortenerController {
     }
 
     @Delete('links/:short_code')
-    async remove(@Param('short_code') short_code: string) {
+    async remove(@Param('short_code') short_code: string): Promise<MessageResponse> {
        return await this.shortenerService.remove(short_code);
     }
 

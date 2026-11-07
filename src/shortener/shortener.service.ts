@@ -5,7 +5,8 @@ import { Link } from './entities/link.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { PaginationQueryDto } from '../core/dto/pagination-query.dto';
-import { paginate } from '../core/utils/pagination.utils';
+import { Page, paginate } from '../core/utils/pagination.utils';
+import { MessageResponse, ShortenResponse } from './dto/return-shortener.dto';
 
 const ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -21,7 +22,7 @@ export class ShortenerService {
         this.baseUrl = this.configService.getOrThrow<string>('BASE_URL')
     }
 
-    async short(original_link: string) {
+    async short(original_link: string): Promise<ShortenResponse> {
 
         const MAX_ATTEMPTS = 3
 
@@ -81,7 +82,7 @@ export class ShortenerService {
         return club;
     }
 
-    async findAll(query: PaginationQueryDto) {
+    async findAll(query: PaginationQueryDto): Promise<Page<Link>> {
         const links = await this.linksRepository.find({
             select: {
                 shortCode: true,
@@ -97,7 +98,7 @@ export class ShortenerService {
         return paginate(links, query.page, query.limit)
     }
 
-    async remove(short_code: string) {
+    async remove(short_code: string): Promise<MessageResponse> {
         const link = await this.find({ where: { shortCode: short_code } })
 
         await this.linksRepository.softRemove(link);
